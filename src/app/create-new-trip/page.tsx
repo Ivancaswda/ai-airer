@@ -1,9 +1,19 @@
 'use client'
 import React, {useState, useEffect} from 'react'
 import ChatBox from "@/app/create-new-trip/_components/chatBox";
-import Itinenary from "@/app/create-new-trip/_components/Itinenary";
+
 import {useTripInfo} from "@/app/provider";
-import GlobalHotelMap from "@/app/create-new-trip/_components/GlobalHotelMap";
+import dynamic from "next/dynamic";
+
+const Itinenary = dynamic(
+    () => import("@/app/create-new-trip/_components/Itinenary"),
+    { ssr: false }
+);
+
+const GlobalHotelMap = dynamic(
+    () => import("@/app/create-new-trip/_components/GlobalHotelMap"),
+    { ssr: false }
+);
 
 import {Button} from "@/components/ui/button";
 import {Globe2, Plane} from "lucide-react";
