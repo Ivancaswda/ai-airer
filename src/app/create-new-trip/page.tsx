@@ -31,10 +31,10 @@ const NewTripPage = () => {
     console.log(activeIndex)
     return (
         <div className='flex items-start relative  gap-5 p-10'>
-            <div className='w-[35%]'>
+            <div className=' w-full md:w-[50%] lg:w-[35%]'>
                 <ChatBox/>
             </div>
-            <div  className='w-[65%]  '>
+            <div  className='  md:w-[50%] lg:w-[65%] hidden md:block  '>
                 {activeIndex === 0 ? <Itinenary/> : <GlobalHotelMap/> }
                 <div className='right-20' >
                     <Tooltip>

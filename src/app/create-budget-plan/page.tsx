@@ -27,6 +27,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import {toast} from "sonner";
 
 const BudgetPlanningChat = () => {
     const router =useRouter()
@@ -112,9 +113,12 @@ const BudgetPlanningChat = () => {
             console.log(isFinal)
 
             if (isFinal) {
+                toast.success('Посмотрите ии-ответ в бюджетных планах')
                 setRecommendation(result.data.trip_details)
                 await SaveBudgetDetail({ budgetDetail: result?.data?.trip_details, budgetId: uuidv4(), uid: user?.userId });
+
             }
+
             setLoading(false);
         } catch (err) {
             if (err.response?.data?.code === "LOCATION_BLOCKED") {
@@ -244,7 +248,7 @@ const BudgetPlanningChat = () => {
                 </section>
             </div>
             {!recommendation || !isFinal ? (
-                <div className="relative w-[50%] h-[85vh]">
+                <div className="relative w-full md:w-[50%] hidden md:block h-[85vh]">
                     <div className="w-full h-full">
                         <Image
                             src="/Budget-Plan.png"
@@ -256,7 +260,9 @@ const BudgetPlanningChat = () => {
                     </div>
                 </div>
             ) : (
-                <BudgetTimeline recommendation={recommendation}/>
+                <div className=' hidden md:block'>
+                    <BudgetTimeline recommendation={recommendation}/>
+                </div>
             )}
 
            </div>

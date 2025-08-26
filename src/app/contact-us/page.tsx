@@ -66,7 +66,7 @@ export default function SupportPage() {
                     }}
                     className="text-2xl px-4 md:text-4xl lg:text-5xl font-bold text-neutral-700 dark:text-white max-w-4xl leading-relaxed lg:leading-snug text-center mx-auto "
                 >
-                   AI airer единственная кто ответит на {" "}
+                   AI airer единственная кто ответит на {" "} <br/>
                     <Highlight className="text-black dark:text-white">
                         вашу жалобу или просьбу
                     </Highlight>
@@ -127,7 +127,7 @@ export default function SupportPage() {
             <footer className="bg-blue-700 dark:bg-black text-white py-12 mt-20">
                 <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
                     {/* Логотип и описание */}
-                    <div className="text-center md:text-left">
+                    <div className="text-center flex items-center md:items-start justify-center md:justify-start md:text-left">
                         <img src='/logo.png'  alt='logo' className='w-[120px]  rounded-3xl h-[110px]'/>
                         <p className="mt-2 text-sm text-blue-100 max-w-xs">
                             Мы помогаем планировать идеальные путешествия с помощью AI. Персонализированные маршруты и уникальные впечатления для каждого.
@@ -170,7 +170,8 @@ export default function SupportPage() {
                 {/* Копирайт */}
                 <div className="mt-10 text-center text-sm text-blue-100">
                     © {new Date().getFullYear()} AI-Airer. Все права защищены. <hr/>
-                    Сделано Иваном Катковским
+                    <p className='text-center mt-2'>Сделано Иваном Катковским</p>
+
                 </div>
             </footer>
         </div>

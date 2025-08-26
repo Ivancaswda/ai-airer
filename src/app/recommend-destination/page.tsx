@@ -26,6 +26,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import FinalUI from "@/app/recommend-destination/_components/FinalUI";
+import {toast} from "sonner";
 
 
 const RecommendDestination = () => {
@@ -110,6 +111,7 @@ const RecommendDestination = () => {
                     recId,
                 });
             }
+            toast.success('Посмотрите ии-ответ в моих рекомендация')
 
             setMessages([...messages, newUserMessage, botResponse]);
             setUserInput("");
@@ -176,7 +178,7 @@ const RecommendDestination = () => {
     }
     return (
         <div className="flex items-start gap-2 ">
-            <div className="h-[85vh] w-[50%] px-2 flex flex-col">
+            <div className="h-[85vh] w-full md:w-[50%] px-2 flex flex-col">
                 <section className="flex-1 flex flex-col gap-4 overflow-y-auto p-4">
                     {messages.length === 0 && <EmptyBoxState onSelectOption={(v: string) => { setUserInput(v); onSendRecommendation(); }} />}
                     {messages.map((msg: any, index) => (
@@ -234,7 +236,7 @@ const RecommendDestination = () => {
                 </section>
             </div>
 
-            <div className="relative w-[50%] h-[85vh]">
+            <div className="relative  hidden md:w-[50%] h-[85vh] block ">
                 <div className="w-full h-full">
                     {photoUrl ? (
                         <div>

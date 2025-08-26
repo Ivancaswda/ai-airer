@@ -30,6 +30,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import {toast} from "sonner";
 
 type Message = {
     role: string,
@@ -160,7 +161,7 @@ const BestPeriodPage = () => {
         if (ui === 'destination') {
             return (
                 <Input className='mt-2'
-                    placeholder="Enter destination (e.g., Bangkok)"
+                    placeholder="Введите место отдыха (Например: Томск)"
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             setUserInput((e.target as HTMLInputElement).value);
@@ -251,6 +252,7 @@ const BestPeriodPage = () => {
                     uid: user?.userId,
                     weather_plan: result.data?.weather_plan
                 })
+                toast.success('Посмотрите ии-ответ в лучших сезонах')
                 setMessages(prev => [
                     ...prev,
                     {
@@ -293,7 +295,7 @@ const BestPeriodPage = () => {
 
     return (
         <div className='h-full  flex  '>
-            <div className='flex flex-col fixed top-20 z-20 w-[50%] h-[85vh]'>
+            <div className='flex flex-col fixed top-20 z-20 w-full md:w-[50%] h-[85vh]'>
                 <section className='flex-1 overflow-y-auto p-4'>
                     {messages.length === 0 && <EmptyBoxState onSelectOption={(v: string) => {
                         setUserInput(v)
@@ -350,7 +352,7 @@ const BestPeriodPage = () => {
                 </section>
 
             </div>
-            <div className="relative w-2/2 flex justify-end h-screen">
+            <div className="relative hidden md:flex w-2/2  justify-end h-screen">
 
                 {!weatherAdvise && <Image src='/Destination.png' width={400} height={400} className='w-[50%] object-cover border-2xl h-[80vh]' alt='dest-image' />}
                 {weatherAdvise && (

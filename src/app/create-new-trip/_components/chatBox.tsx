@@ -226,7 +226,7 @@ const ChatBox = () => {
                     tripId,
                     uid: user?.userId,
                 });
-
+                toast.success('Посмотрите ии-ответ в моих поездках')
                 // Добавляем сообщение FinalUI один раз
                 setMessages(prev => [
                     ...prev,
