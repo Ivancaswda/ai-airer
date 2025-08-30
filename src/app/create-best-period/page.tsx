@@ -12,11 +12,11 @@ import BudgetUi from "@/app/create-new-trip/_components/BudgetUI";
 import TripDuration from "@/app/create-new-trip/_components/TripDuration";
 import Objective from "@/app/create-new-trip/_components/Objective";
 import Demands from "@/app/create-new-trip/_components/Demands";
-import FinalUI from "@/app/create-new-trip/_components/FinalUI";
+import FinalUI from "@/app/create-best-period/_components/FinalUI";
 import {useMutation} from "convex/react";
 import {addPointerInfo} from "framer-motion";
 import {api} from "../../../convex/_generated/api";
-import {uuid} from "zod";
+
 import {useTripInfo} from "@/app/provider";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Select} from "@/components/ui/select";
@@ -31,6 +31,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import {toast} from "sonner";
+
 
 type Message = {
     role: string,
@@ -210,7 +211,7 @@ const BestPeriodPage = () => {
             </div>
         }
         if (ui === 'final' && !weatherAdvise) {
-            return <FinalUI disable={!weatherAdvise} viewTrip={() => router.push('/view-best-seasons')}/>
+            return <FinalUI />
         }
 
         return null;

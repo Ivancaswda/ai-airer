@@ -56,7 +56,7 @@ const Header = () => {
                         :  <Avatar>
                                 <AvatarImage src={user?.image}/>
                                 <AvatarFallback>
-                                    {user.name.charAt(0).toUpperCase()}
+                                    {user?.name?.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>}
 

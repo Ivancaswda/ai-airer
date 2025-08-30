@@ -8,6 +8,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import {toast} from "sonner";
 import {Loader, Loader2Icon} from "lucide-react";
+import {FaMagic} from "react-icons/fa";
 
 export type BestSeasonPlan = {
     seasonId: string,
@@ -64,9 +65,10 @@ const ViewBestSeasons = () => {
         <div className='px-10 py-10 md:px-24 lg:px-48 flex flex-col justify-center items-center gap-5'>
             {myBestSeasons?.length === 0 && (
                 <div className='text-center'>
-                    <h2 className='text-lg mb-4'>You don’t have any best season plan yet!</h2>
+                    <h2 className='text-lg mb-4'>У вас пока нету лучших сезонов!</h2>
                     <Button>
-                        <Link href='/create-best-period'>Create a new plan</Link>
+                        <FaMagic/>
+                        <Link href='/create-best-period'>Сгенерировать лучший сезон</Link>
                     </Button>
                 </div>
             )}

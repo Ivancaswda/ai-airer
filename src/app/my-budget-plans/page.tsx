@@ -8,6 +8,7 @@ import {api} from "../../../convex/_generated/api";
 import {useConvex} from "convex/react";
 import Link from 'next/link';
 import BudgetTimeline from "@/app/create-budget-plan/_components/BudgetTimeline";
+import {FaMagic} from "react-icons/fa";
 
 export type BudgetPlan = {
     budgetId: string,
@@ -35,9 +36,11 @@ const Page = () => {
         <div className='px-10 py-10 md:px-24 lg:px-48 flex flex-col justify-center items-center gap-5'>
             {myBudgetPlans?.length === 0 && (
                 <div className='text-center'>
-                    <h2 className='text-lg mb-4'>You don’t have any budget plan yet!</h2>
+                    <h2 className='text-lg mb-4'>У вас пока нету планов бюджета!</h2>
                     <Button>
-                        <Link href='/create-budget-plan'>Create a new budget plan</Link>
+                        <Link href='/create-budget-plan'>
+                            <FaMagic/>
+                            Создать новый бюджетный план</Link>
                     </Button>
                 </div>
             )}

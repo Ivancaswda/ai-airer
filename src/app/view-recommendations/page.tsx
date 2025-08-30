@@ -68,7 +68,9 @@ const ViewRecommendations = () => {
             ) : (
                 <div className="space-y-4 flex items-center flex-wrap gap-4">
                     {!recommendations || recommendations.length === 0 ? (
-                        <div className="text-center text-gray-500">Нет рекомендаций для отображения</div>
+                        <div className="text-center text-gray-500">
+
+                            Нет рекомендаций для отображения</div>
                     ) : (
                         recommendations.map((rec, index) => (
                             <div key={index} className="flex items-start hover:scale-105 transition cursor-pointer flex-col w-[300px] gap-4 p-4  border rounded-lg shadow-sm">

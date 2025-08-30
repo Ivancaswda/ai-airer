@@ -37,6 +37,7 @@ const RecommendDestination = () => {
     const [recommendation, setRecommendation] = useState<any>(null);
     const [messages, setMessages] = useState<any[]>([]);
     const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+    console.log(photoUrl)
     const saveRecommendation = useMutation(api.savedRecommendations.SaveRecommendation);
     const { user } = useAuth()
     const [isFinal, setIsFinal] = useState<boolean>(false)
@@ -104,14 +105,14 @@ const RecommendDestination = () => {
             const recId = uuidv4()
 
             if (isFinal && user) {
-
+                toast.success('Посмотрите ии-ответ в моих рекомендация')
                 await saveRecommendation({
                     resp: result.data,
                     uid: user.userId,
                     recId,
                 });
             }
-            toast.success('Посмотрите ии-ответ в моих рекомендация')
+
 
             setMessages([...messages, newUserMessage, botResponse]);
             setUserInput("");
@@ -148,7 +149,7 @@ const RecommendDestination = () => {
         }
     };
 
-    console.log(photoUrl)
+
 
     const RenderGenerativeUi = (ui: string) => {
         if (ui === 'taste') {
@@ -236,7 +237,7 @@ const RecommendDestination = () => {
                 </section>
             </div>
 
-            <div className="relative  hidden md:w-[50%] h-[85vh] block ">
+            <div className="relative  hidden md:w-[50%] h-[85vh] md:block ">
                 <div className="w-full h-full">
                     {photoUrl ? (
                         <div>

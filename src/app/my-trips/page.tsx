@@ -7,6 +7,7 @@ import MyTripCardItem from "@/app/my-trips/_components/MyTripCardItem";
 import {api} from "../../../convex/_generated/api";
 import {useConvex} from "convex/react";
 import Link from 'next/link';
+import {FaMagic} from "react-icons/fa";
 
 export type Trip = {
     tripId: string,
@@ -35,7 +36,9 @@ const Page = () => {
                 <div className='text-center'>
                     <h2 className='text-lg mb-4'>У вас еще нет сгенерированных поездок!</h2>
                     <Button>
-                        <Link href='/create-new-trip'>Создать новую поездку</Link>
+                        <FaMagic/>
+                        <Link href='/create-new-trip'>
+                            Создать новую поездку</Link>
                     </Button>
                 </div>
             )}
