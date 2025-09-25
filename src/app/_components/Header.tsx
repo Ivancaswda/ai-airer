@@ -7,7 +7,7 @@ import {useAuth} from "@/context/authContext";
 import {DropdownMenuTrigger, DropdownMenu, DropdownMenuContent} from "@/components/ui/dropdown-menu";
 import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
 import {usePathname} from "next/navigation";
-import {CalendarIcon, CrownIcon, LogOutIcon, PlaneIcon, PlaneLandingIcon, TrainIcon} from "lucide-react";
+import {CalendarIcon, CrownIcon, LogOutIcon, PlaneIcon, PlaneLandingIcon, TrainIcon, UserIcon} from "lucide-react";
 import {BiMoney} from "react-icons/bi";
 
 const Header = () => {
@@ -111,7 +111,10 @@ const Header = () => {
                 </DropdownMenu>
             ) : (
                 <Button>
-                    <Link href='/sign-up'>
+
+
+                    <Link className='flex items-center gap-3' href='/sign-up'>
+                        <UserIcon/>
                         Зарегистрироваться
                     </Link>
                 </Button>
