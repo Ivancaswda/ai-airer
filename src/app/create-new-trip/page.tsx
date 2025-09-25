@@ -36,21 +36,7 @@ const NewTripPage = () => {
             </div>
             <div  className='  md:w-[50%] lg:w-[65%] hidden md:block  '>
                 {activeIndex === 0 ? <Itinenary/> : <GlobalHotelMap/> }
-                <div className='right-20' >
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button onClick={() => setActiveIndex(prev => prev === 0 ? 1 : 0)} className='rounded-2xl absolute bottom-20 left-[70%]'>
 
-                                {activeIndex === 0 ? <Plane/> : <Globe2/>}
-
-
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            Переключить между картой и поездкой
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
 
 
             </div>
