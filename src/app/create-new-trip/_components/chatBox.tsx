@@ -5,7 +5,7 @@ import {v4 as uuidv4} from 'uuid'
 import GroupSizeUi from "@/app/create-new-trip/_components/GroupSizeUI";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
-import {Loader2Icon, Send} from "lucide-react";
+import {AlertCircle, Loader2Icon, Send} from "lucide-react";
 import EmptyBoxState from "@/app/create-new-trip/_components/EmptyBoxState";
 import BudgetUi from "@/app/create-new-trip/_components/BudgetUI";
 import TripDuration from "@/app/create-new-trip/_components/TripDuration";
@@ -15,7 +15,7 @@ import FinalUI from "@/app/create-new-trip/_components/FinalUI";
 import {useMutation} from "convex/react";
 import {addPointerInfo} from "framer-motion";
 import {api} from "../../../../convex/_generated/api";
-import {uuid} from "zod";
+
 import {useTripInfo} from "@/app/provider";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {toast} from "sonner";
@@ -52,6 +52,7 @@ const ChatBox = () => {
     const [userInput, setUserInput] = useState<string>()
     const [locationError, setLocationError] = useState<string | null>(null)
     const {user} = useAuth()
+    const [apiError, setApiError] = useState<string | null>(null);
     const router = useRouter()
     const [loading, setLoading] = useState<boolean>()
     const [messages, setMessages] = useState<Message[]>([])
@@ -71,62 +72,54 @@ const ChatBox = () => {
 
     const onSend = async () => {
         if (!userInput?.trim()) return;
+        setApiError(null);
         setLoading(true);
 
         const newMsg = {
-            role: 'user',
-            content: userInput ?? '',
+            role: "user",
+            content: userInput ?? "",
         };
 
-        setUserInput(''); // Очищаем input
+        setUserInput("");
 
-        setMessages(prev => {
-            const updatedMessages = [...prev, newMsg];
-
-
-            if (isFinal) {
-                return updatedMessages;
-            }
-
-
-            const lastMsg = updatedMessages[updatedMessages.length - 1];
-            if (lastMsg?.content === 'final') {
-                setIsFinal(true); // Если вопрос финальный, переходим к финальной стадии
-            }
-
-            return updatedMessages;
-        });
+        setMessages((prev) => [...prev, newMsg]);
 
         try {
-            const result = await axios.post('/api/aimodel', {
+            const result = await axios.post("/api/aimodel", {
                 messages: [...messages, newMsg],
                 isFinal: isFinal,
             });
 
             if (result.data.resp) {
-                setMessages(prev => [
+                setMessages((prev) => [
                     ...prev,
-                    { role: 'assistant', content: result?.data.resp, ui: result?.data?.ui },
+                    { role: "assistant", content: result?.data.resp, ui: result?.data?.ui },
                 ]);
             }
 
-            // Обработка финального шага
             if (isFinal) {
                 setTripDetail(result?.data?.trip_plan);
-                await SaveTripDetail({ tripDetail: result?.data?.trip_plan, tripId: uuidv4(), uid: user?.userId });
+                await SaveTripDetail({
+                    tripDetail: result?.data?.trip_plan,
+                    tripId: uuidv4(),
+                    uid: user?.userId,
+                });
             }
-        } catch (err) {
-            if (err.response?.data?.code === "QUOTA_EXCEEDED") {
-                setLocationError(err.response.data.error); // показываем в том же попапе
-            }
-            if (err.response?.data?.code === "LOCATION_BLOCKED") {
-                setLocationError(err.response.data.error);
-            }
-            if (err.response?.status === 403 && err.response?.data?.redirect) {
-                router.push(err.response.data.redirect); // редирект на premium
+        } catch (err: any) {
+            console.error("Error generating recommendation:", err);
 
+            // 🧠 обработка лимитов и редиректов
+            if (err.response?.data?.code === "QUOTA_EXCEEDED") {
+                setLocationError(err.response.data.error);
+            } else if (err.response?.data?.code === "LOCATION_BLOCKED") {
+                setLocationError(err.response.data.error);
+            } else if (err.response?.status === 403 && err.response?.data?.redirect) {
+                router.push(err.response.data.redirect);
             } else {
-                console.error("Error generating recommendation:", err);
+                // 🛑 общий случай — ошибка сети или 500 Internal Server Error
+                setApiError(
+                    "⚠️ Произошла ошибка при обращении к AI. Попробуйте отправить сообщение снова или отключите VPN."
+                );
             }
         } finally {
             setLoading(false);
@@ -265,58 +258,87 @@ const ChatBox = () => {
 
 
     return (
-        <div className='h-[85vh] flex flex-col'>
-            <section className='flex-1 overflow-y-auto p-4'>
-                {messages.length === 0 && <EmptyBoxState onSelectOption={(v: string) => {
-                    setUserInput(v)
-                    onSend()
-                }}/>}
-                {messages.map((msg: Message, index) => (
-                    msg.role === 'user' ?   <div key={index} className='flex justify-end mt-2'>
-                        <div className='flex items-start gap-4'>
-                            <div className='max-w-lg bg-blue-100  px-6 rounded-3xl py-3 text-black'>
-
-                                {msg.content}
-                            </div>
-                            <Avatar>
-                                <AvatarFallback className='bg-blue-500 text-white'>{user?.name.charAt(0).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                        </div>
-
-                        </div> :
-                        <div key={index} className='flex justify-start mt-2'>
-                            <div className='max-w-lg text-black flex  items-center gap-4'>
+        <div className="h-[85vh] flex flex-col">
+            <section className="flex-1 overflow-y-auto p-4">
+                {messages.length === 0 && (
+                    <EmptyBoxState
+                        onSelectOption={(v: string) => {
+                            setUserInput(v);
+                            onSend();
+                        }}
+                    />
+                )}
+                {messages.map((msg: Message, index) =>
+                    msg.role === "user" ? (
+                        <div key={index} className="flex justify-end mt-2">
+                            <div className="flex items-start gap-4">
+                                <div className="max-w-lg bg-blue-100 px-6 rounded-3xl py-3 text-black">
+                                    {msg.content}
+                                </div>
                                 <Avatar>
-                                    <AvatarImage src='/Ai-Chat-logo.png' width={40} height={40} className='rounded-full object-cover   w-[60px] h-[60px] cursor-pointer'/>
+                                    <AvatarFallback className="bg-blue-500 text-white">
+                                        {user?.name.charAt(0).toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </div>
+                        </div>
+                    ) : (
+                        <div key={index} className="flex justify-start mt-2">
+                            <div className="max-w-lg text-black flex items-center gap-4">
+                                <Avatar>
+                                    <AvatarImage
+                                        src="/Ai-Chat-logo.png"
+                                        width={40}
+                                        height={40}
+                                        className="rounded-full object-cover w-[60px] h-[60px] cursor-pointer"
+                                    />
                                     <AvatarFallback>AI</AvatarFallback>
                                 </Avatar>
-
-                             <div>
-                                 {msg.content}
-                                 {RenderGenerativeUi(msg?.ui ?? '')}
-                             </div>
-
+                                <div>
+                                    {msg.content}
+                                    {RenderGenerativeUi(msg?.ui ?? "")}
+                                </div>
                             </div>
                         </div>
-                ))}
-                {!isFinal && loading &&
-                    <div className='flex items-center gap-3 w-full  justify-start'>
+                    )
+                )}
+
+                {!isFinal && loading && (
+                    <div className="flex items-center gap-3 w-full justify-start">
                         <Avatar>
-                            <AvatarImage src='/Ai-Chat-logo.png' width={40} height={40} className='rounded-full object-cover w-[60px] h-[60px] cursor-pointer'/>
+                            <AvatarImage
+                                src="/Ai-Chat-logo.png"
+                                width={40}
+                                height={40}
+                                className="rounded-full object-cover w-[60px] h-[60px] cursor-pointer"
+                            />
                             <AvatarFallback>AI</AvatarFallback>
                         </Avatar>
-                        <Loader2Icon className='animate-spin text-blue-500'/>
+                        <Loader2Icon className="animate-spin text-blue-500" />
                     </div>
-                    }
+                )}
+
+
+                {apiError && (
+                    <div className="mt-4 flex items-start gap-3 bg-red-100 text-red-800 border border-red-300 rounded-xl p-4">
+                        <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                        <p className="text-sm">{apiError}</p>
+                    </div>
+                )}
+
                 <div ref={messagesEndRef} />
             </section>
+
             <section>
-                <div className='border rounded-2xl p-4 relative'>
-                    <Textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder='Создайте поездку от Парижа до Москвы'
-                              className='resize-none focus:outline-none focus:border-none  bg-transparent w-full h-28 p-4 rounded-lg'
+                <div className="border rounded-2xl p-4 relative">
+                    <Textarea
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
+                        placeholder="Создайте поездку от Парижа до Москвы"
+                        className="resize-none focus:outline-none bg-transparent w-full h-28 p-4 rounded-lg"
                     />
-                    <Button onClick={onSend} className='absolute bottom-4 right-4 '>
-                        <Send className='h-4 w-4'/>
+                    <Button onClick={onSend} className="absolute bottom-4 right-4">
+                        <Send className="h-4 w-4" />
                     </Button>
                 </div>
             </section>
