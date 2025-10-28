@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "convex/react";
-import { Loader2Icon, Send } from "lucide-react";
+import {AlertCircle, Loader2Icon, Send} from "lucide-react";
 import { api } from "../../../convex/_generated/api";
 import axios from "axios";
 import EmptyBoxState from "@/app/create-new-trip/_components/EmptyBoxState";
@@ -32,6 +32,7 @@ import {toast} from "sonner";
 const RecommendDestination = () => {
     const [locationError, setLocationError] = useState<string | null>(null)
     const router = useRouter()
+    const [apiError, setApiError] = useState<string | null>(null)
     const [userInput, setUserInput] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [recommendation, setRecommendation] = useState<any>(null);
@@ -130,8 +131,11 @@ const RecommendDestination = () => {
             if (err.response?.status === 403 && err.response?.data?.redirect) {
                 router.push(err.response.data.redirect); // редирект на premium
 
+            } else if (err.response?.status === 500) {
+                setApiError("⚠️ Ошибка при обращении к AI. Попробуйте снова или отключите VPN.")
             } else {
-                console.error("Error generating recommendation:", err);
+                setApiError("⚠️ Что-то пошло не так. Попробуйте отправить сообщение снова.")
+                console.error("Error generating recommendation:", err)
             }
         }
     };
@@ -222,6 +226,13 @@ const RecommendDestination = () => {
                             <div className='flex items-center mt-2 justify-center'>
                                 <Loader2Icon className='animate-spin text-blue-600' />
                             </div>
+                        </div>
+                    )}
+
+                    {apiError && (
+                        <div className="mt-4 flex items-start gap-3 bg-red-100 text-red-800 border border-red-300 rounded-xl p-4">
+                            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                            <p className="text-sm">{apiError}</p>
                         </div>
                     )}
                     <div ref={messagesEndRef} />
