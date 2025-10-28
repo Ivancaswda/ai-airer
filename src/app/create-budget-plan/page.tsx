@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, Send } from "lucide-react";
+import {AlertCircle, Loader2Icon, Send} from "lucide-react";
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,6 +31,7 @@ import {toast} from "sonner";
 
 const BudgetPlanningChat = () => {
     const router =useRouter()
+    const [apiError, setApiError] = useState<string | null>(null)
     const [locationError, setLocationError] = useState<string | null>(null)
     const [userInput, setUserInput] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
@@ -62,81 +63,59 @@ const BudgetPlanningChat = () => {
     }, [messages]);
 
     const onSendRecommendation = async () => {
-        if (!userInput.trim()) return;
-        setLoading(true);
+        if (!userInput.trim()) return
+        setApiError(null) // 🔄 сбрасываем прошлую ошибку
+        setLoading(true)
 
-        const newUserMessage = {
-            role: "user",
-            content: userInput,
-        };
+        const newUserMessage = { role: "user", content: userInput }
+        setUserInput("")
 
-        setMessages(prev => {
-            const updatedMessages = [...prev, newUserMessage];
+        setMessages(prev => [...prev, newUserMessage])
 
-
-            if (isFinal) {
-                return updatedMessages;
-            }
-
-
-            const lastMsg = updatedMessages[updatedMessages.length - 1];
-            if (lastMsg?.ui === 'time') {
-                setIsFinal(true); // Если вопрос финальный, переходим к финальной стадии
-            }
-
-            return updatedMessages;
-        });
-        console.log(isFinal)
         try {
             const result = await axios.post("/api/aibudget", {
                 messages: [...messages, newUserMessage],
-                isFinal: isFinal,
-                user
-            });
+                isFinal,
+                user,
+            })
 
             const botResponse = {
                 role: "assistant",
                 content: result.data.resp,
                 ui: result.data.ui,
-                step: result.data.step
-            };
-            console.log(result.data.step)
-
-            console.log(result.data.ui)
-
-
-            setMessages([...messages, newUserMessage, botResponse]);
-            setUserInput("");
-            if (botResponse.ui === "time" ) {
-                setIsFinal(true);
+                step: result.data.step,
             }
-            console.log(isFinal)
+
+            setMessages([...messages, newUserMessage, botResponse])
+
+            if (botResponse.ui === "time") setIsFinal(true)
 
             if (isFinal) {
-                toast.success('Посмотрите ии-ответ в бюджетных планах')
+                toast.success("Посмотрите ИИ-ответ в бюджетных планах")
                 setRecommendation(result.data.trip_details)
-                await SaveBudgetDetail({ budgetDetail: result?.data?.trip_details, budgetId: uuidv4(), uid: user?.userId });
-
+                await SaveBudgetDetail({
+                    budgetDetail: result.data.trip_details,
+                    budgetId: uuidv4(),
+                    uid: user?.userId,
+                })
             }
-
-            setLoading(false);
-        } catch (err) {
+        } catch (err: any) {
             if (err.response?.data?.code === "LOCATION_BLOCKED") {
-                setLocationError(err.response.data.error);
-            }
-            if (err.response?.data?.code === "QUOTA_EXCEEDED") {
-                setLocationError(err.response.data.error); // показываем в том же попапе
-            }
-
-            if (err.response?.status === 403 && err.response?.data?.redirect) {
-                router.push(err.response.data.redirect); // редирект на premium
-
+                setLocationError(err.response.data.error)
+            } else if (err.response?.data?.code === "QUOTA_EXCEEDED") {
+                setLocationError(err.response.data.error)
+            } else if (err.response?.status === 403 && err.response?.data?.redirect) {
+                router.push(err.response.data.redirect)
+            } else if (err.response?.status === 500) {
+                setApiError("⚠️ Ошибка при обращении к AI. Попробуйте снова или отключите VPN.")
             } else {
-                console.error("Error generating recommendation:", err);
+                setApiError("⚠️ Что-то пошло не так. Попробуйте отправить сообщение снова.")
+                console.error("Error generating recommendation:", err)
             }
-            setLoading(false);
+        } finally {
+            setLoading(false)
         }
-    };
+    }
     console.log(isFinal)
     console.log(recommendation)
 
@@ -235,6 +214,13 @@ const BudgetPlanningChat = () => {
                             </div>
                         </div>
                     )}
+
+                      {apiError && (
+                          <div className="mt-4 flex items-start gap-3 bg-red-100 text-red-800 border border-red-300 rounded-xl p-4">
+                              <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                              <p className="text-sm">{apiError}</p>
+                          </div>
+                      )}
                     <div ref={messagesEndRef} />
                 </section>
 
