@@ -6,7 +6,7 @@ import {v4 as uuidv4} from 'uuid'
 import GroupSizeUi from "@/app/create-new-trip/_components/GroupSizeUI";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
-import {Loader2Icon, Send} from "lucide-react";
+import {AlertCircle, Loader2Icon, Send} from "lucide-react";
 import EmptyBoxState from "@/app/create-new-trip/_components/EmptyBoxState";
 import BudgetUi from "@/app/create-new-trip/_components/BudgetUI";
 import TripDuration from "@/app/create-new-trip/_components/TripDuration";
@@ -54,6 +54,7 @@ export type PeriodInfo = {
 
 const BestPeriodPage = () => {
     const router = useRouter()
+    const [apiError, setApiError] = useState<string | null>(null)
     const [locationError, setLocationError] = useState<string | null>(null)
     const [weatherAdvise, setWeatherAdvise] = useState<any>()
     const {tripInfo, setTripInfo} = useTripInfo()
@@ -148,8 +149,11 @@ const BestPeriodPage = () => {
             if (err.response?.status === 403 && err.response?.data?.redirect) {
                 router.push(err.response.data.redirect); // редирект на premium
 
+            } else if (err.response?.status === 500) {
+                setApiError("⚠️ Ошибка при обращении к AI. Попробуйте снова или отключите VPN.")
             } else {
-                console.error("Error generating recommendation:", err);
+                setApiError("⚠️ Что-то пошло не так. Попробуйте отправить сообщение снова.")
+                console.error("Error generating recommendation:", err)
             }
         } finally {
             setLoading(false);
@@ -339,6 +343,12 @@ const BestPeriodPage = () => {
                             <Loader2Icon className='animate-spin text-blue-500'/>
                         </div>}
 
+                    {apiError && (
+                        <div className="mt-4 flex items-start gap-3 bg-red-100 text-red-800 border border-red-300 rounded-xl p-4">
+                            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                            <p className="text-sm">{apiError}</p>
+                        </div>
+                    )}
                     <div ref={messagesEndRef} />
                 </section>
                 <section>
